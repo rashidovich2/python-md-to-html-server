@@ -43,16 +43,13 @@ class md_to_html_SimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
         if self.path.endswith(".md") and os.path.exists(f".{self.path}"):  # check for markdown file request
             markdown_to_html(f".{self.path}")  # render temp html file
             self.path = "/tmp.html"
-        f = self.send_head()
-        if f:
+        if f := self.send_head():
             try:
                 self.copyfile(f, self.wfile)
             finally:
                 f.close()
-        try:
+        with contextlib.suppress(FileNotFoundError):
             os.remove("./tmp.html")  # remove temp html file
-        except FileNotFoundError:
-            pass
 
 
 if __name__ == "__main__":
